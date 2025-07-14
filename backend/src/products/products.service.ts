@@ -1,50 +1,44 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { Product, ProductDocument } from './schemas/product.schema';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Product as ProductEntity } from './product.entity';  // Asegúrate de que el nombre del archivo y la clase sean correctos
 import { CreateProductDto } from './dto/create-product.dto';
+import { UpdateProductDto } from './dto/update-product.dto';
 
 @Injectable()
 export class ProductsService {
   constructor(
-    @InjectModel(Product.name)
-    private readonly productModel: Model<ProductDocument>,
+    @InjectRepository(ProductEntity)  // Aquí usamos el repositorio de TypeORM para ProductEntity
+    private readonly productRepo: Repository<ProductEntity>,
   ) {}
 
-  async findAll(): Promise<Product[]> {
-    return this.productModel.find().exec();
+  async findAll(): Promise<ProductEntity[]> {
+    return this.productRepo.find();
   }
 
-  async findById(id: string): Promise<Product> {
-    const product = await this.productModel.findById(id).exec();
+  async findById(id: number): Promise<ProductEntity> {
+    const product = await this.productRepo.findOneBy({ id });
     if (!product) {
       throw new NotFoundException(`Producto con ID ${id} no encontrado`);
     }
     return product;
   }
 
-  async create(product: CreateProductDto): Promise<Product> {
-    const createdProduct = new this.productModel(product);
-    return createdProduct.save();
+  async create(data: CreateProductDto): Promise<ProductEntity> {
+    const product = this.productRepo.create(data);
+    return this.productRepo.save(product);
   }
 
-  async update(id: string, updateData: Partial<Product>): Promise<Product> {
-    const updatedProduct = await this.productModel.findByIdAndUpdate(
-      id,
-      updateData,
-      { new: true },
-    );
-    if (!updatedProduct) {
-      throw new NotFoundException(`No se pudo actualizar: ID ${id} no encontrado`);
-    }
-    return updatedProduct;
+  async update(id: number, updateData: UpdateProductDto): Promise<ProductEntity> {
+    const product = await this.findById(id);
+    Object.assign(product, updateData);
+    return this.productRepo.save(product);
   }
 
-  async delete(id: string): Promise<{ deleted: boolean }> {
-    const result = await this.productModel.findByIdAndDelete(id).exec();
-    if (!result) {
-      throw new NotFoundException(`No se encontró producto con ID ${id} para eliminar`);
+  async delete(id: number): Promise<void> {
+    const result = await this.productRepo.delete(id);
+    if (result.affected === 0) {
+      throw new NotFoundException(`Producto con ID ${id} no encontrado`);
     }
-    return { deleted: true };
   }
 }

@@ -1,18 +1,30 @@
-import { Controller, Get, Post, Body } from '@nestjs/common';
-import { UsersService } from './users.service';
-import { User } from './schemas/user.schema';
+import {Controller,Get,Post,Body,Param,NotFoundException,UseGuards,Request,} from '@nestjs/common';
+import { OrdersService } from '../orders/orders.service';
+import { CreateOrderDto } from '../orders/dto/create-order.dto';
+import { Order } from '../orders/order.entity';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
-@Controller('users')
-export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+@Controller('orders')
+@UseGuards(JwtAuthGuard)
+export class UsersController  {
+  constructor(private readonly ordersService: OrdersService) {}
 
   @Get()
-  getAll(): Promise<User[]> {
-    return this.usersService.findAll();
+  async findAll(): Promise<Order[]> {
+    return this.ordersService.findAll();
+  }
+
+  @Get(':id')
+  async findById(@Param('id') id: string): Promise<Order> {
+    const numericId = parseInt(id, 10);
+    const order = await this.ordersService.findById(numericId);
+    if (!order) throw new NotFoundException('Orden no encontrada');
+    return order;
   }
 
   @Post()
-  create(@Body() user: Partial<User>): Promise<User> {
-    return this.usersService.create(user);
+  async create(@Request() req, @Body() createOrderDto: CreateOrderDto): Promise<Order> {
+    const userId = req.user.sub;
+    return this.ordersService.create(userId, createOrderDto);
   }
 }

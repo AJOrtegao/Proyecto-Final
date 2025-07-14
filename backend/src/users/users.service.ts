@@ -1,13 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { User, UserDocument } from './schemas/user.schema';
+import { User as UserEntity } from './user.entity';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectModel(User.name)
     private readonly userModel: Model<UserDocument>,
+
+    @InjectRepository(UserEntity)
+    private readonly userRepository: Repository<UserEntity>,
   ) {}
 
   async create(data: Partial<User>): Promise<User> {
@@ -20,7 +26,10 @@ export class UsersService {
   }
 
   async findAll(): Promise<User[]> {
-  return this.userModel.find().exec();
-}
+    return this.userModel.find().exec();
+  }
 
+  async findById(id: number): Promise<UserEntity | null> {
+    return this.userRepository.findOne({ where: { id } });
+  }
 }
