@@ -1,6 +1,8 @@
-import { Controller, Get, Post, Put, Delete, Param, Body } from '@nestjs/common';
+import {Controller,Get,Post,Body,Param,Put,Delete,NotFoundException,} from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { Product } from './schemas/product.schema';
+import { CreateProductDto } from './dto/create-product.dto';
+import { UpdateProductDto } from './dto/update-product.dto';
 
 @Controller('products')
 export class ProductsController {
@@ -13,25 +15,30 @@ export class ProductsController {
 
   @Get(':id')
   async getById(@Param('id') id: string): Promise<Product> {
-    return this.productsService.findById(id);
+    const product = await this.productsService.findById(id);
+    if (!product) throw new NotFoundException('Producto no encontrado');
+    return product;
   }
 
   @Post()
-  async create(@Body() product: Partial<Product>): Promise<Product> {
-    return this.productsService.create(product);
+  async create(@Body() createDto: CreateProductDto): Promise<Product> {
+    return this.productsService.create(createDto);
   }
 
   @Put(':id')
   async update(
     @Param('id') id: string,
-    @Body() updateData: Partial<Product>,
+    @Body() updateDto: UpdateProductDto,
   ): Promise<Product> {
-    return this.productsService.update(id, updateData);
+    const updated = await this.productsService.update(id, updateDto);
+    if (!updated) throw new NotFoundException('Producto no encontrado');
+    return updated;
   }
 
   @Delete(':id')
   async delete(@Param('id') id: string): Promise<{ message: string }> {
-    await this.productsService.delete(id);
+    const deleted = await this.productsService.delete(id);
+    if (!deleted) throw new NotFoundException('Producto no encontrado');
     return { message: 'Producto eliminado correctamente' };
   }
 }
