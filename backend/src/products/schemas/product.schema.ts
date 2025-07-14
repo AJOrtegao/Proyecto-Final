@@ -8,14 +8,11 @@ export class Product {
   @Prop({ required: true })
   name: string;
 
-  @Prop({ required: true })
+  @Prop()
   price: number;
 
-  @Prop({ required: false })
+  @Prop()
   description: string;
-
-  @Prop({ required: true })
-  stock: number;
 }
 
 export const ProductSchema = SchemaFactory.createForClass(Product);
