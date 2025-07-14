@@ -1,17 +1,42 @@
 import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Order, OrderDocument } from './schemas/order.schema';
-import { Model } from 'mongoose';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Order } from './order.entity';
+import { OrderItem } from './order-item.entity';
+import { CreateOrderDto } from './dto/create-order.dto';
+import { Product } from '../products/product.entity';
 
 @Injectable()
 export class OrdersService {
-  constructor(@InjectModel(Order.name) private orderModel: Model<OrderDocument>) {}
+  constructor(
+    @InjectRepository(Order) private orderRepo: Repository<Order>,
+    @InjectRepository(OrderItem) private orderItemRepo: Repository<OrderItem>,
+    @InjectRepository(Product) private productRepo: Repository(Product),
+  ) {}
 
-  create(order: Partial<Order>) {
-    return this.orderModel.create(order);
+  async findAll(): Promise<Order[]> {
+    return this.orderRepo.find();
   }
 
-  findAll() {
-    return this.orderModel.find().exec();
+  async create(createOrderDto: CreateOrderDto): Promise<Order> {
+    const { userId, items } = createOrderDto;
+
+    const order = this.orderRepo.create({ userId });
+    await this.orderRepo.save(order);
+
+    const orderItems = await Promise.all(
+      items.map(async ({ productId, quantity }) => {
+        const product = await this.productRepo.findOneBy({ id: productId });
+        const item = this.orderItemRepo.create({
+          order,
+          product,
+          quantity,
+        });
+        return this.orderItemRepo.save(item);
+      }),
+    );
+
+    order.items = orderItems;
+    return order;
   }
 }
