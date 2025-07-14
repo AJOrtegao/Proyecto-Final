@@ -5,10 +5,16 @@ import { Product, ProductDocument } from './schemas/product.schema';
 
 @Injectable()
 export class ProductsService {
-  constructor(@InjectModel(Product.name) private productModel: Model<ProductDocument>) {}
+  constructor(
+    @InjectModel(Product.name) private productModel: Model<ProductDocument>,
+  ) {}
 
   async findAll(): Promise<Product[]> {
     return this.productModel.find().exec();
+  }
+
+  async findOne(id: string): Promise<Product> {
+    return this.productModel.findById(id).exec();
   }
 
   async create(product: Partial<Product>): Promise<Product> {
