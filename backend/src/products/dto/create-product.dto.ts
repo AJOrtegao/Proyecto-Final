@@ -10,12 +10,12 @@ export class CreateProductDto {
   description?: string;
 
   @Type(() => Number)
-  @IsNumber()
-  @IsPositive()
+  @IsNumber({}, { message: 'price debe ser un número' })
+  @IsPositive({ message: 'price debe ser un número positivo' })
   price: number;
 
   @Type(() => Number)
-  @IsNumber()
-  @Min(0)
+  @IsNumber({}, { message: 'stock debe ser un número' })
+  @Min(0, { message: 'stock no puede ser negativo' })
   stock: number;
 }
