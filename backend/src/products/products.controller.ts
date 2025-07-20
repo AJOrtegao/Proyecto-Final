@@ -1,12 +1,14 @@
-import { Controller, Get, Post, Body, Param, Put, Delete, NotFoundException, UseGuards } from '@nestjs/common';
+import {Controller,Get,Post,Body,Param,Put,Delete,NotFoundException,UseGuards,} from '@nestjs/common';
 import { ProductsService } from './products.service';
-import { CreateProductDto } from './dto/create-product.dto';
-import { UpdateProductDto } from './dto/update-product.dto';
+import { CreateProductDto } from '../admin/dto/create-product.dto';
+import { UpdateProductDto } from '../admin/dto/update-product.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { Roles } from '../auth/roles.decorator';
+import { RolesGuard } from '../auth/roles.guard';
 import { Product } from './product.entity';
 
 @Controller('products')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
@@ -23,11 +25,13 @@ export class ProductsController {
   }
 
   @Post()
+  @Roles('admin')
   async create(@Body() createDto: CreateProductDto): Promise<Product> {
     return this.productsService.create(createDto);
   }
 
   @Put(':id')
+  @Roles('admin')
   async update(
     @Param('id') id: string,
     @Body() updateDto: UpdateProductDto,
@@ -38,7 +42,8 @@ export class ProductsController {
   }
 
   @Delete(':id')
-  async delete(@Param('id') id: string): Promise<{ message: string }> {
+  @Roles('admin')
+  async remove(@Param('id') id: string): Promise<{ message: string }> {
     await this.productsService.delete(Number(id));
     return { message: 'Producto eliminado correctamente' };
   }

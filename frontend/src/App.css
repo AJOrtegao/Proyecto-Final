@@ -24,10 +24,32 @@
   color: white;
 }
 
-.App-link {
-  color: #61dafb;
+/* Colores llamativos para la barra de navegación */
+.Navbar {
+  background-color: #1d3557; /* Azul oscuro */
 }
 
+.Navbar a {
+  color: #f1faee !important;  /* Color de los enlaces */
+  font-size: 18px;
+  transition: color 0.3s ease;
+}
+
+/* Efecto de hover y de selección */
+.Navbar a:hover {
+  color: #e63946; /* Color brillante al hacer hover */
+}
+
+.Navbar a.active {
+  color: #e63946; /* Color de enlace seleccionado */
+}
+
+/* Efecto sutil al interactuar con la barra de navegación */
+.Navbar -toggler-icon {
+  background-color: #f1faee; /* Color de la hamburguesa */
+}
+
+/* Animación de logo */
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);
@@ -35,4 +57,43 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+/* Estilos de los productos */
+.product-card {
+  transition: transform 0.3s ease-in-out;
+}
+
+.product-card:hover {
+  transform: scale(1.05); /* Efecto de escala al pasar el mouse */
+}
+
+.product-card img {
+  transition: transform 0.3s ease-in-out;
+}
+
+.product-card img:hover {
+  transform: scale(1.1); /* Efecto de imagen en hover */
+}
+
+/* Estilos generales para los productos */
+.product-title {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.product-description {
+  font-size: 0.9rem;
+}
+
+.product-price {
+  font-size: 1.2rem;
+  color: #e63946; /* Color llamativo para los precios */
+  font-weight: bold;
+}
+
+/* Fondo suave y sutil para la página */
+body {
+  background-color: #f1faee; /* Color de fondo suave */
+  font-family: 'Arial', sans-serif;
 }

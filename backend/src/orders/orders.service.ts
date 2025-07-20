@@ -5,74 +5,70 @@ import { Order } from './order.entity';
 import { OrderItem } from './entities/order-item.entity';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UsersService } from '../users/users.service';
-import { Product } from '../products/product.entity';  // Importar Product para poder buscar productos
+import { Product } from '../products/product.entity';
 
 @Injectable()
 export class OrdersService {
   constructor(
     @InjectRepository(Order)
-    private readonly orderRepository: Repository<Order>,
-
+    private readonly ordersRepository: Repository<Order>,
     @InjectRepository(OrderItem)
     private readonly itemRepository: Repository<OrderItem>,
-
     @InjectRepository(Product)
-    private readonly productRepository: Repository<Product>,  // Agregar repositorio de Product
-
+    private readonly productRepository: Repository<Product>,
     private readonly usersService: UsersService,
   ) {}
 
-  async findAll(): Promise<Order[]> {
-    return this.orderRepository.find({ relations: ['items'] });
-  }
-
-  async findById(id: number): Promise<Order> {
-    const order = await this.orderRepository.findOne({
-      where: { id },
-      relations: ['items'],
-    });
-    if (!order) throw new NotFoundException(`Orden ID ${id} no encontrada`);
-    return order;
-  }
-
-  async findAllByUser(userId: number): Promise<Order[]> {
-    return this.orderRepository.find({
-      where: { userId },
-      relations: ['items'],
-    });
-  }
-
-  async findByIdAndUser(id: number, userId: number): Promise<Order> {
-    const order = await this.orderRepository.findOne({
-      where: { id, userId },
-      relations: ['items'],
-    });
-    if (!order) throw new NotFoundException(`Orden ID ${id} no encontrada o no pertenece al usuario`);
-    return order;
-  }
-
-  async create(userId: number, dto: CreateOrderDto): Promise<Order> {
+  async create(userId: number, createOrderDto: CreateOrderDto): Promise<Order> {
     const user = await this.usersService.findById(userId);
-    if (!user) throw new NotFoundException(`Usuario con ID ${userId} no encontrado`);
+    if (!user) {
+      throw new NotFoundException(`Usuario con ID ${userId} no encontrado`);
+    }
 
-    // Buscar y asignar productos a los items de la orden
     const orderItems = await Promise.all(
-      dto.items.map(async (item) => {
+      createOrderDto.items.map(async (item) => {
         const product = await this.productRepository.findOne({ where: { id: item.productId } });
-        if (!product) throw new NotFoundException(`Producto con ID ${item.productId} no encontrado`);
-
+        if (!product) {
+          throw new NotFoundException(`Producto con ID ${item.productId} no encontrado`);
+        }
         return this.itemRepository.create({
-          product,  
+          product,
           quantity: item.quantity,
         });
       }),
     );
 
-    const order = this.orderRepository.create({
+    const order = this.ordersRepository.create({
       userId,
       items: orderItems,
     });
 
-    return this.orderRepository.save(order);
+    return this.ordersRepository.save(order);
+  }
+
+  async findAll(): Promise<Order[]> {
+    return this.ordersRepository.find({ relations: ['items', 'items.product'] });
+  }
+
+  async findAllByUser(userId: number): Promise<Order[]> {
+    return this.ordersRepository.find({
+      where: { userId },
+      relations: ['items', 'items.product'],
+    });
+  }
+
+  async findByIdAndUser(orderId: number, userId: number): Promise<Order> {
+    const order = await this.ordersRepository.findOne({
+      where: { id: orderId, userId },
+      relations: ['items', 'items.product'],
+    });
+    if (!order) {
+      throw new NotFoundException(`Orden ID ${orderId} no encontrada o no pertenece al usuario`);
+    }
+    return order;
+  }
+
+  async findById(id: number): Promise<Order | null> {
+    return this.ordersRepository.findOne({ where: { id } });
   }
 }

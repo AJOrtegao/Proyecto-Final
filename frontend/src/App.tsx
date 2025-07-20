@@ -1,46 +1,80 @@
-import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import NavigationBar from './components/Navbar';
 import Home from './pages/Home';
 import Productos from './pages/Productos';
 import Cart from './pages/Cart';
+import Checkout from './pages/Checkout';
+import Signup from './pages/Signup';
+import Login from './pages/Login';
+import PrivateRoute from './components/PrivateRoute';
+import AdminPanel from './pages/AdminPanel';
+import PaymentPage from './pages/PaymentPage';
+import API from './api/api';
+import './App.css';
 
-// Definición de productos con _id: string
-const products = [
-  {
-    _id: '1',
-    name: 'Paracetamol 500mg',
-    description: 'Alivio del dolor y fiebre',
-    price: 5.99,
-    imageUrl: 'https://cdn.pixabay.com/photo/2016/03/05/22/23/tablets-1238990_960_720.jpg',
-  },
-  {
-    _id: '2',
-    name: 'Ibuprofeno 400mg',
-    description: 'Antiinflamatorio',
-    price: 7.50,
-    imageUrl: 'https://cdn.pixabay.com/photo/2017/01/31/22/20/medicine-2022237_960_720.jpg',
-  },
-  {
-    _id: '3',
-    name: 'Vitaminas C',
-    description: 'Fortalece tu sistema inmunológico',
-    price: 10.00,
-    imageUrl: 'https://cdn.pixabay.com/photo/2016/04/15/11/47/vitamins-1334369_960_720.jpg',
-  },
-];
+interface Product {
+  _id: string;
+  name: string;
+  description: string;
+  price: number;
+  imageUrl: string;
+  quantity?: number;
+}
 
-function App() {
+const App: React.FC = () => {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [cart, setCart] = useState<Product[]>([]);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await API.get('/productos');
+        setProducts(response.data);
+      } catch (error) {
+        console.error('Error al obtener productos', error);
+      }
+    };
+    fetchProducts();
+  }, []);
+
+  const addToCart = (product: Product) => {
+    setCart((prevCart) => {
+      const existingProduct = prevCart.find((p) => p._id === product._id);
+      if (existingProduct) {
+        return prevCart.map((p) =>
+          p._id === product._id ? { ...p, quantity: (p.quantity || 1) + 1 } : p
+        );
+      }
+      return [...prevCart, { ...product, quantity: 1 }];
+    });
+  };
+
+  const removeFromCart = (productId: string) => {
+    setCart((prevCart) => prevCart.filter((product) => product._id !== productId));
+  };
+
+  const calculateTotal = () => {
+    return cart.reduce((total, product) => total + product.price * (product.quantity || 1), 0);
+  };
+
   return (
-    <BrowserRouter>
+    <Router>
       <NavigationBar />
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/productos" element={<Productos products={products} />} />
-        <Route path="/carrito" element={<Cart />} />
+        <Route path="/productos" element={<Productos products={products} addToCart={addToCart} />} />
+        <Route path="/carrito" element={<PrivateRoute><Cart cart={cart} setCart={setCart} removeFromCart={removeFromCart} calculateTotal={calculateTotal} /></PrivateRoute>} />
+        <Route path="/checkout" element={<PrivateRoute><Checkout /></PrivateRoute>} />
+        <Route path="/payment" element={<PrivateRoute><PaymentPage total={calculateTotal()} /></PrivateRoute>} />
+        <Route path="/admin" element={<PrivateRoute adminOnly><AdminPanel /></PrivateRoute>} />
+        <Route path="/admin/products" element={<PrivateRoute adminOnly><AdminPanel /></PrivateRoute>} />
+        <Route path="/admin/orders" element={<PrivateRoute adminOnly><AdminPanel /></PrivateRoute>} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/login" element={<Login />} />
       </Routes>
-    </BrowserRouter>
+    </Router>
   );
-}
+};
 
 export default App;

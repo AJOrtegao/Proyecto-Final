@@ -1,30 +1,34 @@
-import {Controller,Get,Post,Body,Param,NotFoundException,UseGuards,Request,} from '@nestjs/common';
+import { Controller, Get, Param, NotFoundException } from '@nestjs/common';
+import { UsersService } from './users.service';
 import { OrdersService } from '../orders/orders.service';
-import { CreateOrderDto } from '../orders/dto/create-order.dto';
-import { Order } from '../orders/order.entity';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
-@Controller('orders')
-@UseGuards(JwtAuthGuard)
-export class UsersController  {
-  constructor(private readonly ordersService: OrdersService) {}
+@Controller('users')
+export class UsersController {
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly ordersService: OrdersService,
+  ) {}
 
-  @Get()
-  async findAll(): Promise<Order[]> {
-    return this.ordersService.findAll();
-  }
-
-  @Get(':id')
-  async findById(@Param('id') id: string): Promise<Order> {
-    const numericId = parseInt(id, 10);
-    const order = await this.ordersService.findById(numericId);
-    if (!order) throw new NotFoundException('Orden no encontrada');
+  @Get(':id/orders/:orderId')
+  async getOrderById(@Param('id') id: string, @Param('orderId') orderId: string) {
+    const order = await this.ordersService.findByIdAndUser(Number(orderId), Number(id));
+    if (!order) {
+      throw new NotFoundException(`Orden con ID ${orderId} no encontrada para el usuario ${id}`);
+    }
     return order;
   }
 
-  @Post()
-  async create(@Request() req, @Body() createOrderDto: CreateOrderDto): Promise<Order> {
-    const userId = req.user.sub;
-    return this.ordersService.create(userId, createOrderDto);
+  @Get(':id/orders')
+  async getOrdersByUser(@Param('id') id: string) {
+    return this.ordersService.findAllByUser(Number(id));
+  }
+
+  @Get(':id')
+  async getUserById(@Param('id') id: string) {
+    const user = await this.usersService.findById(Number(id));
+    if (!user) {
+      throw new NotFoundException(`Usuario con ID ${id} no encontrado`);
+    }
+    return user;
   }
 }
