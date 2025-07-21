@@ -1,9 +1,10 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Order } from './order.entity';
 import { OrderItem } from './entities/order-item.entity';
 import { CreateOrderDto } from './dto/create-order.dto';
+import { UpdateOrderDto } from './dto/update-order.dto';
 import { UsersService } from '../users/users.service';
 import { Product } from '../products/product.entity';
 
@@ -70,5 +71,19 @@ export class OrdersService {
 
   async findById(id: number): Promise<Order | null> {
     return this.ordersRepository.findOne({ where: { id } });
+  }
+
+  async update(id: number, updateOrderDto: UpdateOrderDto): Promise<Order> {
+    const order = await this.ordersRepository.findOne({ where: { id } });
+    if (!order) {
+      throw new NotFoundException(`Orden con ID ${id} no encontrada`);
+    }
+
+    if (!updateOrderDto.status) {
+      throw new BadRequestException('Debe proporcionarse un estado válido para actualizar');
+    }
+
+    order.status = updateOrderDto.status;
+    return this.ordersRepository.save(order);
   }
 }

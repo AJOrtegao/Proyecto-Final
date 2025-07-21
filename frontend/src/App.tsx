@@ -1,15 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import NavigationBar from './components/Navbar';
+import ContactPage from './pages/ContactPage';
 import Home from './pages/Home';
 import Productos from './pages/Productos';
 import Cart from './pages/Cart';
-import Checkout from './pages/Checkout';
+import CheckoutPage from './pages/CheckoutPage';
 import Signup from './pages/Signup';
 import Login from './pages/Login';
 import PrivateRoute from './components/PrivateRoute';
 import AdminPanel from './pages/AdminPanel';
 import PaymentPage from './pages/PaymentPage';
+import AdminOrders from './pages/AdminOrders';
+import NavigationBar from './components/Navbar';
+import PublicFooter from './components/PublicFooter';
 import API from './api/api';
 import './App.css';
 
@@ -59,21 +62,22 @@ const App: React.FC = () => {
   };
 
   return (
-    <Router>
-      <NavigationBar />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/productos" element={<Productos products={products} addToCart={addToCart} />} />
-        <Route path="/carrito" element={<PrivateRoute><Cart cart={cart} setCart={setCart} removeFromCart={removeFromCart} calculateTotal={calculateTotal} /></PrivateRoute>} />
-        <Route path="/checkout" element={<PrivateRoute><Checkout /></PrivateRoute>} />
-        <Route path="/payment" element={<PrivateRoute><PaymentPage total={calculateTotal()} /></PrivateRoute>} />
-        <Route path="/admin" element={<PrivateRoute adminOnly><AdminPanel /></PrivateRoute>} />
-        <Route path="/admin/products" element={<PrivateRoute adminOnly><AdminPanel /></PrivateRoute>} />
-        <Route path="/admin/orders" element={<PrivateRoute adminOnly><AdminPanel /></PrivateRoute>} />
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/login" element={<Login />} />
-      </Routes>
-    </Router>
+      <Router>
+        <NavigationBar />
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/contacto" element={<ContactPage />} />
+          <Route path="/productos" element={<Productos products={products} addToCart={addToCart} />} />
+          <Route path="/carrito" element={<PrivateRoute><Cart cart={cart} setCart={setCart} removeFromCart={removeFromCart} calculateTotal={calculateTotal}/></PrivateRoute>} />
+          <Route path="/checkout" element={<PrivateRoute><CheckoutPage cart={cart} setCart={setCart} calculateTotal={calculateTotal}/></PrivateRoute>} />
+          <Route path="/pago" element={<PrivateRoute><PaymentPage total={calculateTotal()} orderId={123}/></PrivateRoute>} />
+          <Route path="/admin" element={<PrivateRoute adminOnly><AdminPanel /></PrivateRoute>} />
+          <Route path="/admin/orders" element={<PrivateRoute adminOnly><AdminOrders /></PrivateRoute>} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/login" element={<Login />} />
+        </Routes>
+        <PublicFooter />
+      </Router>
   );
 };
 

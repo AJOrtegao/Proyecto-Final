@@ -3,6 +3,7 @@ import {
   Post,
   Get,
   Param,
+  Patch,
   Body,
   Request,
   NotFoundException,
@@ -12,6 +13,7 @@ import { OrdersService } from './orders.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { Order } from './order.entity';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { UpdateOrderDto } from './dto/update-order.dto';
 
 @Controller('orders')
 @UseGuards(JwtAuthGuard)
@@ -47,5 +49,11 @@ export class OrdersController {
     }
 
     return order;
+  }
+  
+  @Patch(':id')
+  updateOrder(@Param('id') id: string, @Body() updateOrderDto: UpdateOrderDto) {
+    return this.ordersService.update(parseInt(id, 10), updateOrderDto);
+
   }
 }

@@ -22,7 +22,7 @@ interface CartProps {
 const Cart: React.FC<CartProps> = ({ cart, removeFromCart, calculateTotal, setCart }) => {
   const navigate = useNavigate();
 
-  const handleCheckout = () => {
+  const handleConfirmarPedido = () => {
     navigate('/checkout');
   };
 
@@ -76,7 +76,7 @@ const Cart: React.FC<CartProps> = ({ cart, removeFromCart, calculateTotal, setCa
         <Button
           variant="success"
           style={{ marginTop: '10px', width: '100%' }}
-          onClick={handleCheckout}
+          onClick={handleConfirmarPedido}
           disabled={cart.length === 0}
         >
           Finalizar Compra
@@ -87,3 +87,4 @@ const Cart: React.FC<CartProps> = ({ cart, removeFromCart, calculateTotal, setCa
 };
 
 export default Cart;
+

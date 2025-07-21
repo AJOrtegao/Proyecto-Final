@@ -24,7 +24,7 @@ export default function NavigationBar() {
             <NavLink to="/" end className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Inicio</NavLink>
             <NavLink to="/productos" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Productos</NavLink>
             <NavLink to="/carrito" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Carrito</NavLink>
-            <NavLink to="/pago" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Pagar</NavLink>
+            {/* <NavLink to="/pago" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Pagar</NavLink> */}
             {user.isLoggedIn && user.role === 'admin' && (
               <NavLink to="/admin" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Admin Panel</NavLink>
             )}
@@ -34,3 +34,4 @@ export default function NavigationBar() {
     </Navbar>
   );
 }
+

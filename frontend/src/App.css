@@ -1,82 +1,83 @@
-.App {
-  text-align: center;
+/* Estilo global */
+body {
+  background-color: #f8f6fc;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #343a40;
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+/* Navbar */
+.navbar {
+  background-color: #6f42c1 !important;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
-
-/* Colores llamativos para la barra de navegación */
-.Navbar {
-  background-color: #1d3557; /* Azul oscuro */
-}
-
-.Navbar a {
-  color: #f1faee !important;  /* Color de los enlaces */
+.navbar a {
+  color: #ffffff !important;
   font-size: 18px;
   transition: color 0.3s ease;
 }
 
-/* Efecto de hover y de selección */
-.Navbar a:hover {
-  color: #e63946; /* Color brillante al hacer hover */
+.navbar a:hover,
+.navbar a.active {
+  color: #ffe66d !important;
+  font-weight: bold;
 }
 
-.Navbar a.active {
-  color: #e63946; /* Color de enlace seleccionado */
+/* Botones */
+.btn-primary {
+  background-color: #6f42c1;
+  border-color: #6f42c1;
 }
 
-/* Efecto sutil al interactuar con la barra de navegación */
-.Navbar -toggler-icon {
-  background-color: #f1faee; /* Color de la hamburguesa */
+.btn-primary:hover {
+  background-color: #5a32a3;
+  border-color: #5a32a3;
 }
 
-/* Animación de logo */
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.btn-success {
+  background-color: #28a745;
+  border-color: #28a745;
 }
 
-/* Estilos de los productos */
-.product-card {
-  transition: transform 0.3s ease-in-out;
+.btn-success:hover {
+  background-color: #218838;
+  border-color: #218838;
 }
 
-.product-card:hover {
-  transform: scale(1.05); /* Efecto de escala al pasar el mouse */
+.btn-danger {
+  background-color: #dc3545;
+  border-color: #dc3545;
 }
 
-.product-card img {
-  transition: transform 0.3s ease-in-out;
+.btn-danger:hover {
+  background-color: #c82333;
+  border-color: #c82333;
 }
 
-.product-card img:hover {
-  transform: scale(1.1); /* Efecto de imagen en hover */
+/* Inputs y formularios */
+.form-control:focus {
+  border-color: #6f42c1;
+  box-shadow: 0 0 0 0.2rem rgba(111, 66, 193, 0.25);
 }
 
-/* Estilos generales para los productos */
+/* Tarjetas */
+.card {
+  box-shadow: 0 0 10px rgba(111, 66, 193, 0.1);
+  border: none;
+  transition: transform 0.2s ease-in-out;
+}
+
+.card:hover {
+  transform: scale(1.02);
+}
+
+.card-title {
+  color: #6f42c1;
+}
+
+/* Productos */
 .product-title {
   font-size: 1.2rem;
   font-weight: bold;
@@ -88,12 +89,22 @@
 
 .product-price {
   font-size: 1.2rem;
-  color: #e63946; /* Color llamativo para los precios */
+  color: #dc3545;
   font-weight: bold;
 }
 
-/* Fondo suave y sutil para la página */
-body {
-  background-color: #f1faee; /* Color de fondo suave */
-  font-family: 'Arial', sans-serif;
+/* Logo animado */
+.App-logo {
+  height: 40vmin;
+  animation: App-logo-spin infinite 20s linear;
+  pointer-events: none;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }

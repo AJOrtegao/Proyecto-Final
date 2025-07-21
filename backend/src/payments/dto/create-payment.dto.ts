@@ -1,4 +1,5 @@
-import { IsString, IsOptional, IsNumber } from 'class-validator';
+import { IsString, IsOptional, IsNumber, IsEnum } from 'class-validator';
+import { PaymentStatus } from '../payment.entity';
 
 export class CreatePaymentDto {
   @IsNumber()
@@ -10,4 +11,10 @@ export class CreatePaymentDto {
 
   @IsNumber()
   orderId: number;
+
+  @IsOptional()
+  @IsEnum(PaymentStatus, {
+    message: 'El estado debe ser pending, paid o failed',
+  })
+  status?: PaymentStatus;
 }

@@ -12,11 +12,14 @@ export class Product {
   @Column({ nullable: true })
   description: string;
 
-  @Column('decimal')
+  @Column('decimal', { precision: 10, scale: 2 })
   price: number;
 
-  @Column()
+  @Column('int')
   stock: number;
+
+  @Column({ nullable: true })
+  imageUrl: string;
 
   @OneToMany(() => OrderItem, (orderItem) => orderItem.product)
   orderItems: OrderItem[];
